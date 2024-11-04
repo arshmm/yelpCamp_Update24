@@ -8,27 +8,24 @@ const { reviewSchema } = require("../schemas");
 
 const Campground = require("../models/campground");
 const Review = require("../models/review");
+const {
+  validateReview,
+  isLoggedin,
+  isAuthor,
+  isReviewAuthor,
+} = require("../middleware");
 
-//========================================================================
-
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((x) => x.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
 //========================================================================
 
 router.post(
   "/",
+  isLoggedin,
   validateReview,
   catchAsync(async (req, res) => {
     const id = req.params.id;
     const campground = await Campground.findById(id);
     const review = new Review(req.body.review);
+    review.author = req.user._id;
     campground.reviews.push(review);
     review.save();
     campground.save();
@@ -40,6 +37,8 @@ router.post(
 
 router.delete(
   "/:reviewId",
+  isLoggedin,
+  isReviewAuthor,
   catchAsync(async (req, res) => {
     const { id, reviewId } = req.params;
     await Review.findByIdAndDelete(reviewId);
