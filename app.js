@@ -9,6 +9,10 @@ const LocalStrategy = require("passport-local");
 
 const path = require("path");
 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const app = express();
 //==================================Routes==================================================================
 
