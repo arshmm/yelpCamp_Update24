@@ -25,6 +25,11 @@ const userRoutes = require("./routes/users");
 const User = require("./models/user");
 
 //==================================DB Configuration==================================================================
+const dbUrl = process.env.DB_URL;
+const uri =
+  "mongodb+srv://dev:blablu552@cluster0.pg8he.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+//"mongodb://localhost:27017/yelp-camp"
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
 const db = mongoose.connection;
 
@@ -48,7 +53,7 @@ const sessionConfig = {
   cookie: {
     name: "session",
     httpOnly: true,
-    secure: true,
+    //secure: true,
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
@@ -115,6 +120,7 @@ app.use(
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
+
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();
